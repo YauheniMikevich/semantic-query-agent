@@ -29,7 +29,7 @@ async def test_clear_query_flow(semantic_model, db_conn):
         mock_interpret.return_value = mock_interpret_result
         mock_respond.return_value = "Total revenue by region YTD: Nordic 5M, DACH 4M..."
 
-        agent = create_agent(semantic_model, db_conn, max_validation_retries=1)
+        agent = create_agent(semantic_model, db_conn, max_validation_retries=1, confidence_threshold=0.7)
         result = await agent.ainvoke({"messages": [HumanMessage(content="Show total revenue by region YTD")]})
 
         assert result["response"] is not None
@@ -55,7 +55,7 @@ async def test_ambiguous_query_flow(semantic_model, db_conn):
         mock_interpret.return_value = mock_interpret_result
         mock_clarify.return_value = "Could you clarify which metric you mean? Revenue, units sold, or margins?"
 
-        agent = create_agent(semantic_model, db_conn, max_validation_retries=1)
+        agent = create_agent(semantic_model, db_conn, max_validation_retries=1, confidence_threshold=0.7)
         result = await agent.ainvoke({"messages": [HumanMessage(content="How are sales doing?")]})
 
         assert result["response"] is not None
@@ -79,7 +79,7 @@ async def test_out_of_scope_flow(semantic_model, db_conn):
         mock_interpret.return_value = mock_interpret_result
         mock_respond.return_value = "I can only answer questions about vehicle sales data."
 
-        agent = create_agent(semantic_model, db_conn, max_validation_retries=1)
+        agent = create_agent(semantic_model, db_conn, max_validation_retries=1, confidence_threshold=0.7)
         result = await agent.ainvoke({"messages": [HumanMessage(content="What's the weather?")]})
 
         assert result["response"] is not None
@@ -109,7 +109,7 @@ async def test_validation_retry_flow(semantic_model, db_conn):
         mock_interpret.side_effect = [bad_result, good_result]
         mock_respond.return_value = "Total revenue by region: ..."
 
-        agent = create_agent(semantic_model, db_conn, max_validation_retries=1)
+        agent = create_agent(semantic_model, db_conn, max_validation_retries=1, confidence_threshold=0.7)
         result = await agent.ainvoke({"messages": [HumanMessage(content="Show revenue by region")]})
 
         assert result["response"] is not None
@@ -134,7 +134,7 @@ async def test_validation_max_retry_then_respond(semantic_model, db_conn):
         mock_interpret.return_value = bad_result
         mock_respond.return_value = "I couldn't process that query."
 
-        agent = create_agent(semantic_model, db_conn, max_validation_retries=1)
+        agent = create_agent(semantic_model, db_conn, max_validation_retries=1, confidence_threshold=0.7)
         result = await agent.ainvoke({"messages": [HumanMessage(content="Show me nonexistent data")]})
 
         assert result["response"] is not None
@@ -162,7 +162,7 @@ async def test_empty_results_flow(semantic_model, db_conn):
         mock_interpret.return_value = mock_interpret_result
         mock_respond.return_value = "No data matched your query criteria."
 
-        agent = create_agent(semantic_model, db_conn, max_validation_retries=1)
+        agent = create_agent(semantic_model, db_conn, max_validation_retries=1, confidence_threshold=0.7)
         result = await agent.ainvoke({"messages": [HumanMessage(content="Revenue in Antarctica")]})
 
         assert result["response"] is not None
@@ -191,7 +191,7 @@ async def test_low_confidence_routes_to_clarify(semantic_model, db_conn):
         mock_interpret.return_value = mock_interpret_result
         mock_clarify.return_value = "Could you clarify what metric you're interested in?"
 
-        agent = create_agent(semantic_model, db_conn, max_validation_retries=1)
+        agent = create_agent(semantic_model, db_conn, max_validation_retries=1, confidence_threshold=0.7)
         result = await agent.ainvoke({"messages": [HumanMessage(content="How did regions do this year?")]})
 
         assert result["response"] is not None
@@ -223,7 +223,7 @@ async def test_high_confidence_routes_to_execute(semantic_model, db_conn):
         mock_interpret.return_value = mock_interpret_result
         mock_respond.return_value = "Total revenue by region YTD: ..."
 
-        agent = create_agent(semantic_model, db_conn, max_validation_retries=1)
+        agent = create_agent(semantic_model, db_conn, max_validation_retries=1, confidence_threshold=0.7)
         result = await agent.ainvoke({"messages": [HumanMessage(content="Show total revenue by region YTD")]})
 
         assert result["response"] is not None
@@ -251,7 +251,7 @@ async def test_confidence_at_threshold_routes_to_execute(semantic_model, db_conn
         mock_interpret.return_value = mock_interpret_result
         mock_respond.return_value = "Total revenue by region YTD: ..."
 
-        agent = create_agent(semantic_model, db_conn, max_validation_retries=1)
+        agent = create_agent(semantic_model, db_conn, max_validation_retries=1, confidence_threshold=0.7)
         result = await agent.ainvoke({"messages": [HumanMessage(content="Show total revenue by region YTD")]})
 
         assert result["response"] is not None
@@ -276,7 +276,7 @@ async def test_ambiguity_reason_takes_precedence_over_low_confidence(semantic_mo
         mock_interpret.return_value = mock_interpret_result
         mock_clarify.return_value = "Which metric do you mean?"
 
-        agent = create_agent(semantic_model, db_conn, max_validation_retries=1)
+        agent = create_agent(semantic_model, db_conn, max_validation_retries=1, confidence_threshold=0.7)
         result = await agent.ainvoke({"messages": [HumanMessage(content="How are sales?")]})
 
         assert result["response"] is not None

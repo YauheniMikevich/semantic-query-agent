@@ -1,7 +1,9 @@
+import logging
 import pathlib
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
@@ -9,6 +11,8 @@ from semantic_query_agent.agent import create_agent
 from semantic_query_agent.database import create_database
 from semantic_query_agent.models import QueryRequest, QueryResponse
 from semantic_query_agent.semantic_model import load_semantic_model
+
+logger = logging.getLogger(__name__)
 
 # --- Global state ---
 _agent = None
@@ -52,8 +56,15 @@ async def health():
 
 @app.post("/query", response_model=QueryResponse)
 async def query(request: QueryRequest):
-    response_text = await process_query(request.session_id, request.message)
-    return QueryResponse(response=response_text)
+    try:
+        response_text = await process_query(request.session_id, request.message)
+        return QueryResponse(response=response_text)
+    except Exception:
+        logger.exception("Error processing query")
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "An internal error occurred. Please try again or rephrase your question."},
+        )
 
 
 # Mount static files last (so API routes take priority)

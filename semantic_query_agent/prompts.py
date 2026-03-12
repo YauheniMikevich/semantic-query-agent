@@ -20,6 +20,9 @@ def build_interpret_system_prompt(model: SemanticModel) -> str:
 
     return f"""You are a vehicle sales analytics assistant. Your job is to interpret natural language questions and extract a structured query plan.
 
+TODAY'S DATE: 2025-11-18
+Use this as the reference date when interpreting relative time expressions (e.g., "last quarter", "this year").
+
 You have access to the following semantic model:
 
 METRICS (quantitative measures you can compute):

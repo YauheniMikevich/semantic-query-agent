@@ -24,3 +24,6 @@ run:
 
 test:
 	poetry run pytest tests/ -v
+
+demo:
+	poetry run python run_test_questions.py

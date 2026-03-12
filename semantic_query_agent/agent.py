@@ -31,6 +31,7 @@ _semantic_model: SemanticModel | None = None
 _db_conn: duckdb.DuckDBPyConnection | None = None
 _system_prompt: str | None = None
 _max_validation_retries: int = 1
+_confidence_threshold: float = 0.7
 
 
 # --- LLM Call Wrappers (mockable in tests) ---
@@ -134,6 +135,14 @@ def route_node(state: AgentState) -> dict:
         error = _validate_query_plan(result.query_plan, _semantic_model)
         if error:
             return {"validation_error": error, "retry_count": state.retry_count + 1}
+        if result.confidence_score < _confidence_threshold:
+            updated_result = result.model_copy(
+                update={
+                    "ambiguity_reason": result.confidence_reasoning
+                    or f"Low confidence ({result.confidence_score:.0%}) in query interpretation."
+                }
+            )
+            return {"validation_error": None, "interpret_result": updated_result}
         return {"validation_error": None}
     return {"validation_error": None}
 
@@ -191,18 +200,26 @@ def create_agent(
     semantic_model: SemanticModel,
     db_conn: duckdb.DuckDBPyConnection,
     max_validation_retries: int | None = None,
+    confidence_threshold: float | None = None,
 ):
     """Build and compile the LangGraph agent."""
-    global _semantic_model, _db_conn, _system_prompt, _max_validation_retries
+    global _semantic_model, _db_conn, _system_prompt, _max_validation_retries, _confidence_threshold
 
     _semantic_model = semantic_model
     _db_conn = db_conn
     _system_prompt = build_interpret_system_prompt(semantic_model)
 
+    settings = get_settings()
+
     if max_validation_retries is None:
-        _max_validation_retries = get_settings().max_validation_retries
+        _max_validation_retries = settings.max_validation_retries
     else:
         _max_validation_retries = max_validation_retries
+
+    if confidence_threshold is None:
+        _confidence_threshold = settings.confidence_threshold
+    else:
+        _confidence_threshold = confidence_threshold
 
     workflow = StateGraph(AgentState)
 

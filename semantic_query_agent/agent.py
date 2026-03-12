@@ -211,7 +211,9 @@ def create_agent(
 
     settings = get_settings() if (max_validation_retries is None or confidence_threshold is None) else None
 
-    _max_validation_retries = max_validation_retries if max_validation_retries is not None else settings.max_validation_retries
+    _max_validation_retries = (
+        max_validation_retries if max_validation_retries is not None else settings.max_validation_retries
+    )
     _confidence_threshold = confidence_threshold if confidence_threshold is not None else settings.confidence_threshold
 
     workflow = StateGraph(AgentState)

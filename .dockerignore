@@ -1,0 +1,17 @@
+.venv
+.env
+.git
+.idea
+.vscode
+.pytest_cache
+.mypy_cache
+__pycache__
+*.pyc
+tests/
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yaml
+Makefile
+.claude/
+.worktrees/

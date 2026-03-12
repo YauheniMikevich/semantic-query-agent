@@ -40,7 +40,7 @@ async def call_interpret(messages: list[BaseMessage], system_prompt: str) -> Int
     """Call GPT-4o to interpret the user's query into a structured plan."""
     settings = get_settings()
     llm = ChatOpenAI(model=settings.openai_model, api_key=settings.openai_api_key)
-    structured_llm = llm.with_structured_output(InterpretResult)
+    structured_llm = llm.with_structured_output(InterpretResult, method="function_calling")
     response = await structured_llm.ainvoke([SystemMessage(content=system_prompt)] + messages)
     return response
 

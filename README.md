@@ -108,17 +108,24 @@ semantic_query_agent/
 ├── main.py              # FastAPI app, endpoints, startup
 ├── agent.py             # LangGraph state machine, nodes
 ├── models.py            # Pydantic models (state, query plan, API schemas)
-├── semantic_model.py    # YAML loader, Pydantic models for metrics/dimensions
+├── prompts.py           # System prompts for INTERPRET and RESPOND nodes
 ├── sql_builder.py       # QueryPlan → SQL string
-├── config.py            # Pydantic BaseSettings from .env
-└── prompts.py           # System prompts for INTERPRET and RESPOND nodes
+├── semantic_model.py    # YAML loader
+├── database.py          # DuckDB setup, loads sales_data.json
+└── config.py            # Pydantic BaseSettings from .env
 static/
 └── index.html           # Chat frontend (vanilla JS)
 tests/
+├── conftest.py          # Shared fixtures (semantic_model, db_conn)
+├── test_agent.py        # Agent flow tests (clear, ambiguous, out-of-scope, retry)
+├── test_api.py          # FastAPI endpoint tests
+├── test_database.py     # Database loading tests
 ├── test_semantic_model.py
-├── test_sql_builder.py
-├── test_agent.py
-└── test_api.py
+└── test_sql_builder.py
+semantic_model.yaml      # Metrics, dimensions, time periods, synonyms
+sales_data.json          # Vehicle sales dataset
+test_questions.json      # Golden set of test questions
+run_test_questions.py    # Demo script: runs test questions end-to-end
 ```
 
 ## Limitations

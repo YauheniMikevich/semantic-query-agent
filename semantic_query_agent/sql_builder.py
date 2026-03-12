@@ -1,6 +1,5 @@
 from semantic_query_agent.models import QueryPlan, SemanticModel
 
-
 _SNOWFLAKE_TO_DUCKDB = {
     "TO_CHAR": "STRFTIME",
 }

@@ -3,7 +3,6 @@ import pathlib
 
 import duckdb
 
-
 DATA_PATH = pathlib.Path(__file__).parent.parent / "sales_data.json"
 
 

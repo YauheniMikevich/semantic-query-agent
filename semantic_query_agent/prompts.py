@@ -7,20 +7,15 @@ def build_interpret_system_prompt(model: SemanticModel) -> str:
     Includes all metrics, dimensions, time periods, and synonyms
     so the LLM can match user queries to the semantic model.
     """
-    metrics_section = "\n".join(
-        f"  - {m.name}: {m.description} (expr: {m.expr})" for m in model.metrics
-    )
+    metrics_section = "\n".join(f"  - {m.name}: {m.description} (expr: {m.expr})" for m in model.metrics)
     dimensions_section = "\n".join(
         f"  - {d.name}: {d.description}"
         + (f" (allowed values: {', '.join(d.allowed_values)})" if d.allowed_values else "")
         for d in model.dimensions
     )
-    time_periods_section = "\n".join(
-        f"  - {tp.name}: {tp.description}" for tp in model.time_periods
-    )
+    time_periods_section = "\n".join(f"  - {tp.name}: {tp.description}" for tp in model.time_periods)
     synonyms_section = "\n".join(
-        f"  - \"{s.term}\" -> {s.maps_to}" + (f" (value: {s.value})" if s.value else "")
-        for s in model.synonyms
+        f'  - "{s.term}" -> {s.maps_to}' + (f" (value: {s.value})" if s.value else "") for s in model.synonyms
     )
 
     return f"""You are a vehicle sales analytics assistant. Your job is to interpret natural language questions and extract a structured query plan.

@@ -17,7 +17,5 @@ def test_query_by_region():
 
 def test_query_electric_vehicles():
     conn = create_database()
-    result = conn.execute(
-        "SELECT COUNT(*) FROM TRANSACTIONS WHERE vehicle_type = 'Electric'"
-    ).fetchone()
+    result = conn.execute("SELECT COUNT(*) FROM TRANSACTIONS WHERE vehicle_type = 'Electric'").fetchone()
     assert result[0] > 0

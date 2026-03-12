@@ -1,6 +1,6 @@
 import pathlib
 
-from semantic_query_agent.models import Dimension, Metric, Synonym, TimePeriod
+from semantic_query_agent.models import Metric, Synonym
 from semantic_query_agent.semantic_model import load_semantic_model
 
 

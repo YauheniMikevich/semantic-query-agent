@@ -1,7 +1,7 @@
 from typing import Annotated
 
 import duckdb
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages import BaseMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
@@ -11,7 +11,6 @@ from semantic_query_agent.config import get_settings
 from semantic_query_agent.models import InterpretResult, QueryPlan, SemanticModel
 from semantic_query_agent.prompts import RESPOND_SYSTEM_PROMPT, build_interpret_system_prompt
 from semantic_query_agent.sql_builder import build_sql
-
 
 # --- Agent State ---
 
@@ -56,12 +55,12 @@ async def call_respond(messages: list[BaseMessage], query_result: list[dict] | N
     elif query_result is not None:
         context = f"Query results:\n{query_result}\n\nFormat these results into a clear, natural language response."
     else:
-        context = "The user asked an out-of-scope question. Politely explain you can only help with vehicle sales analytics."
+        context = (
+            "The user asked an out-of-scope question. Politely explain you can only help with vehicle sales analytics."
+        )
 
     response = await llm.ainvoke(
-        [SystemMessage(content=RESPOND_SYSTEM_PROMPT)]
-        + messages
-        + [SystemMessage(content=context)]
+        [SystemMessage(content=RESPOND_SYSTEM_PROMPT)] + messages + [SystemMessage(content=context)]
     )
     return response.content
 
@@ -73,10 +72,12 @@ async def interpret_node(state: AgentState) -> dict:
     """Interpret the user's query into a structured plan."""
     messages = list(state.messages)
     if state.validation_error:
-        messages.append(SystemMessage(
-            content=f"Your previous query plan was invalid: {state.validation_error}. "
-            "Please fix the metric/dimension/time period names and try again.",
-        ))
+        messages.append(
+            SystemMessage(
+                content=f"Your previous query plan was invalid: {state.validation_error}. "
+                "Please fix the metric/dimension/time period names and try again.",
+            )
+        )
     result = await call_interpret(messages, _system_prompt)
     return {"interpret_result": result}
 
@@ -101,9 +102,7 @@ def _validate_query_plan(plan: QueryPlan, model: SemanticModel) -> str | None:
         if d not in dimension_names:
             errors.append(f"Unknown filter dimension '{d}'. Available: {', '.join(sorted(dimension_names))}")
     if plan.time_period and plan.time_period not in time_period_names:
-        errors.append(
-            f"Unknown time period '{plan.time_period}'. Available: {', '.join(sorted(time_period_names))}"
-        )
+        errors.append(f"Unknown time period '{plan.time_period}'. Available: {', '.join(sorted(time_period_names))}")
 
     return "; ".join(errors) if errors else None
 

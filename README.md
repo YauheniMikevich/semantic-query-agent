@@ -72,6 +72,14 @@ make run
 
 Open http://localhost:8000 in your browser for the chat UI.
 
+### Run Test Questions
+
+Process all 5 test questions from `test_questions.json` and print structured results (interpretation, query results, natural language summary):
+
+```bash
+make demo
+```
+
 ### Docker
 
 ```bash

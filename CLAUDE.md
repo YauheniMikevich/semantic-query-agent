@@ -18,3 +18,4 @@ After completing implementation, always run:
 - Always use Pydantic `BaseModel` over dataclass for structured data
 - Python 3.11, managed with Poetry
 - Always use poetry package manager to update dependencies and never modify `poetry.lock` or `pyproject.toml` manually
+- Use `X | None` syntax instead of `Optional[X]` for nullable types

@@ -1,5 +1,7 @@
 # Semantic Query Agent
 
+[![CI](https://github.com/YauheniMikevich/semantic-query-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/YauheniMikevich/semantic-query-agent/actions/workflows/ci.yml)
+
 A LangGraph-based agent that translates natural language questions about vehicle sales into SQL queries against a semantic model, executed on DuckDB. Exposed via FastAPI with a minimal chat frontend.
 
 **Tech stack:** Python 3.11, LangGraph, LangChain-OpenAI (GPT-4o), DuckDB, FastAPI, Pydantic, Poetry

@@ -1,0 +1,53 @@
+[
+  {
+    "id": 1,
+    "question": "What was our average deal margin by region last quarter?",
+    "expected_interpretation": {
+      "metrics": ["avg_deal_margin"],
+      "dimensions": ["region"],
+      "filters": {},
+      "time_period": "last_quarter"
+    },
+    "notes": "Primary test case. Should return 5 regions with margin percentages. Nordic should have highest margin, Southern Europe lowest."
+  },
+  {
+    "id": 2,
+    "question": "Show total revenue by vehicle model YTD",
+    "expected_interpretation": {
+      "metrics": ["total_revenue"],
+      "dimensions": ["vehicle_model"],
+      "filters": {},
+      "time_period": "ytd"
+    },
+    "notes": "Tests YTD time period and revenue metric."
+  },
+  {
+    "id": 3,
+    "question": "Which dealer sold the most electric vehicles last quarter?",
+    "expected_interpretation": {
+      "metrics": ["units_sold"],
+      "dimensions": ["dealer_name"],
+      "filters": {
+        "vehicle_type": "Electric"
+      },
+      "time_period": "last_quarter"
+    },
+    "notes": "Tests filtering by vehicle_type and ranking. Should identify top dealer."
+  },
+  {
+    "id": 4,
+    "question": "How are sales doing?",
+    "expected_interpretation": null,
+    "expected_behavior": "clarification_needed",
+    "clarification_example": "Could you clarify what you'd like to know? For example: total revenue, units sold, or margins? And for what time period?",
+    "notes": "Ambiguous query. System should ask clarifying questions about metric and time period."
+  },
+  {
+    "id": 5,
+    "question": "What's the weather forecast for next week?",
+    "expected_interpretation": null,
+    "expected_behavior": "out_of_scope",
+    "response_example": "I can only answer questions about vehicle sales data. I can help with metrics like revenue, units sold, margins, and dimensions like region, vehicle model, or dealer.",
+    "notes": "Out of scope. System should politely decline and explain what it can do."
+  }
+]

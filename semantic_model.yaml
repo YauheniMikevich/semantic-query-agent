@@ -1,0 +1,237 @@
+# Semantic Model: Vehicle Sales Analytics
+# Format: Snowflake Cortex Analyst compatible
+# Reference: https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst
+
+name: vehicle_sales_analytics
+description: Semantic model for vehicle sales performance analysis
+
+# Database connection (for reference - you'll use mock data locally)
+database: ANALYTICS_DB
+schema: SALES
+base_table: TRANSACTIONS
+
+# ============================================
+# METRICS - Quantitative measures
+# ============================================
+metrics:
+  - name: total_revenue
+    display_name: Total Revenue
+    description: Total sales revenue in EUR
+    expr: SUM(sale_price_eur)
+    data_type: NUMBER
+    default_aggregation: SUM
+
+  - name: units_sold
+    display_name: Units Sold
+    description: Total number of vehicles sold
+    expr: COUNT(transaction_id)
+    data_type: NUMBER
+    default_aggregation: SUM
+
+  - name: avg_deal_margin
+    display_name: Average Deal Margin
+    description: Average profit margin percentage per deal
+    expr: AVG((sale_price_eur - cost_eur) / sale_price_eur * 100)
+    data_type: NUMBER
+    default_aggregation: AVG
+
+  - name: avg_sale_price
+    display_name: Average Sale Price
+    description: Average vehicle sale price in EUR
+    expr: AVG(sale_price_eur)
+    data_type: NUMBER
+    default_aggregation: AVG
+
+  - name: total_cost
+    display_name: Total Cost
+    description: Total vehicle cost in EUR
+    expr: SUM(cost_eur)
+    data_type: NUMBER
+    default_aggregation: SUM
+
+  - name: avg_days_to_sale
+    display_name: Average Days to Sale
+    description: Average number of days from listing to sale
+    expr: AVG(days_on_lot)
+    data_type: NUMBER
+    default_aggregation: AVG
+
+# ============================================
+# DIMENSIONS - Categorical attributes
+# ============================================
+dimensions:
+  - name: region
+    display_name: Sales Region
+    description: Geographic sales region
+    expr: region
+    data_type: STRING
+    allowed_values:
+      - Nordic
+      - DACH
+      - Benelux
+      - UK
+      - Southern Europe
+
+  - name: vehicle_model
+    display_name: Vehicle Model
+    description: Vehicle model name
+    expr: vehicle_model
+    data_type: STRING
+    allowed_values:
+      - XC40
+      - XC60
+      - XC90
+      - S60
+      - S90
+      - V60
+      - V90
+      - EX30
+      - EX90
+      - C40
+
+  - name: vehicle_type
+    display_name: Vehicle Type
+    description: Vehicle body type category
+    expr: vehicle_type
+    data_type: STRING
+    allowed_values:
+      - SUV
+      - Sedan
+      - Wagon
+      - Electric
+
+  - name: dealer_name
+    display_name: Dealer Name
+    description: Name of the selling dealer
+    expr: dealer_name
+    data_type: STRING
+
+  - name: customer_segment
+    display_name: Customer Segment
+    description: Type of customer
+    expr: customer_segment
+    data_type: STRING
+    allowed_values:
+      - Retail
+      - Fleet
+      - Lease
+
+  - name: sale_month
+    display_name: Sale Month
+    description: Month of sale in YYYY-MM format
+    expr: TO_CHAR(sale_date, 'YYYY-MM')
+    data_type: STRING
+
+  - name: sale_quarter
+    display_name: Sale Quarter
+    description: Quarter of sale in YYYY-QN format
+    expr: TO_CHAR(sale_date, 'YYYY') || '-Q' || QUARTER(sale_date)
+    data_type: STRING
+
+# ============================================
+# TIME INTELLIGENCE
+# ============================================
+time_dimension:
+  name: sale_date
+  display_name: Sale Date
+  description: Date of vehicle sale
+  expr: sale_date
+  data_type: DATE
+
+time_periods:
+  - name: last_quarter
+    description: Previous complete quarter (Q3 2025 = Jul-Sep)
+    filter: sale_date BETWEEN '2025-07-01' AND '2025-09-30'
+
+  - name: current_quarter
+    description: Current quarter to date (Q4 2025 = Oct-Nov)
+    filter: sale_date BETWEEN '2025-10-01' AND '2025-11-18'
+
+  - name: ytd
+    description: Year to date (Jan 1 to today)
+    filter: sale_date BETWEEN '2025-01-01' AND '2025-11-18'
+
+  - name: last_year
+    description: Previous 12 months
+    filter: sale_date BETWEEN '2024-11-18' AND '2025-11-18'
+
+  - name: last_month
+    description: Previous complete month (October 2025)
+    filter: sale_date BETWEEN '2025-10-01' AND '2025-10-31'
+
+# ============================================
+# SYNONYMS - Alternative terms users might use
+# ============================================
+synonyms:
+  # Metric synonyms
+  - term: margin
+    maps_to: avg_deal_margin
+  - term: profit margin
+    maps_to: avg_deal_margin
+  - term: profitability
+    maps_to: avg_deal_margin
+  - term: revenue
+    maps_to: total_revenue
+  - term: sales
+    maps_to: total_revenue
+    note: Context-dependent, could also mean units_sold
+  - term: cars sold
+    maps_to: units_sold
+  - term: vehicles sold
+    maps_to: units_sold
+  - term: volume
+    maps_to: units_sold
+  - term: price
+    maps_to: avg_sale_price
+  - term: selling time
+    maps_to: avg_days_to_sale
+  - term: time to sell
+    maps_to: avg_days_to_sale
+
+  # Dimension synonyms
+  - term: country
+    maps_to: region
+  - term: market
+    maps_to: region
+  - term: model
+    maps_to: vehicle_model
+  - term: car type
+    maps_to: vehicle_type
+  - term: body type
+    maps_to: vehicle_type
+  - term: customer type
+    maps_to: customer_segment
+  - term: segment
+    maps_to: customer_segment
+
+  # Vehicle type synonyms
+  - term: electric
+    maps_to: vehicle_type
+    value: Electric
+  - term: EV
+    maps_to: vehicle_type
+    value: Electric
+  - term: electric vehicles
+    maps_to: vehicle_type
+    value: Electric
+
+# ============================================
+# SAMPLE QUESTIONS (for validation)
+# ============================================
+sample_questions:
+  - question: "What was our average deal margin by region last quarter?"
+    metrics: [avg_deal_margin]
+    dimensions: [region]
+    time_period: last_quarter
+
+  - question: "Show total revenue by vehicle model YTD"
+    metrics: [total_revenue]
+    dimensions: [vehicle_model]
+    time_period: ytd
+
+  - question: "Which dealer sold the most electric vehicles?"
+    metrics: [units_sold]
+    dimensions: [dealer_name]
+    filters:
+      vehicle_type: Electric
+    time_period: ytd

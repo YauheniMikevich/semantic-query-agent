@@ -45,8 +45,12 @@ async def test_ambiguous_query_flow(semantic_model, db_conn):
         ambiguity_reason="The query 'How are sales doing?' is ambiguous. Which metric (revenue, units sold, margins) and time period?",
     )
 
-    with patch("semantic_query_agent.agent.call_interpret", new_callable=AsyncMock) as mock_interpret:
+    with (
+        patch("semantic_query_agent.agent.call_interpret", new_callable=AsyncMock) as mock_interpret,
+        patch("semantic_query_agent.agent.call_clarify", new_callable=AsyncMock) as mock_clarify,
+    ):
         mock_interpret.return_value = mock_interpret_result
+        mock_clarify.return_value = "Could you clarify which metric you mean? Revenue, units sold, or margins?"
 
         agent = create_agent(semantic_model, db_conn, max_validation_retries=1)
         result = await agent.ainvoke({"messages": [HumanMessage(content="How are sales doing?")]})

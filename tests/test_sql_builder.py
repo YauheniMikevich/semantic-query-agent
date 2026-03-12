@@ -96,3 +96,43 @@ def test_unknown_time_period_raises(semantic_model):
     plan = QueryPlan(metrics=["total_revenue"], time_period="nonexistent_period")
     with pytest.raises(ValueError, match="Unknown time period"):
         build_sql(plan, semantic_model)
+
+
+def test_sql_executes_revenue_by_region(semantic_model, db_conn):
+    plan = QueryPlan(
+        metrics=["total_revenue"],
+        dimensions=["region"],
+        time_period="ytd",
+    )
+    sql = build_sql(plan, semantic_model)
+    result = db_conn.execute(sql).fetchall()
+    assert len(result) > 0
+    # Each row should have (region, total_revenue)
+    for row in result:
+        assert isinstance(row[0], str)  # region
+        assert row[1] > 0  # revenue > 0
+
+
+def test_sql_executes_electric_vehicles_by_dealer(semantic_model, db_conn):
+    plan = QueryPlan(
+        metrics=["units_sold"],
+        dimensions=["dealer_name"],
+        filters={"vehicle_type": "Electric"},
+        time_period="last_quarter",
+    )
+    sql = build_sql(plan, semantic_model)
+    result = db_conn.execute(sql).fetchall()
+    assert len(result) > 0
+
+
+def test_sql_executes_revenue_by_sale_month(semantic_model, db_conn):
+    """Verify STRFTIME translation works at runtime on DuckDB."""
+    plan = QueryPlan(
+        metrics=["total_revenue"],
+        dimensions=["sale_month"],
+    )
+    sql = build_sql(plan, semantic_model)
+    result = db_conn.execute(sql).fetchall()
+    assert len(result) > 0
+    # sale_month should be YYYY-MM format
+    assert "-" in str(result[0][0])

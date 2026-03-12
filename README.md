@@ -23,8 +23,8 @@ graph LR
 stateDiagram-v2
     [*] --> INTERPRET
     INTERPRET --> ROUTE
-    ROUTE --> EXECUTE : valid query plan
-    ROUTE --> CLARIFY : ambiguous
+    ROUTE --> EXECUTE : valid plan,\nhigh confidence
+    ROUTE --> CLARIFY : ambiguous or\nlow confidence
     ROUTE --> RESPOND : out of scope
     ROUTE --> INTERPRET : invalid plan\n(retry, max 1)
     EXECUTE --> RESPOND
@@ -32,8 +32,8 @@ stateDiagram-v2
     RESPOND --> [*] : return answer
 ```
 
-- **INTERPRET** — LLM extracts a structured query plan (metrics, dimensions, filters, time range) from user input, grounded by the semantic model and its synonym map.
-- **ROUTE** — Pure Python. Validates the query plan against the semantic model. Routes to EXECUTE, CLARIFY, or RESPOND. Retries INTERPRET once on validation failure.
+- **INTERPRET** — LLM extracts a structured query plan (metrics, dimensions, filters, time range) and a confidence score from user input, grounded by the semantic model and its synonym map.
+- **ROUTE** — Pure Python. Validates the query plan against the semantic model and checks the LLM's confidence score against a configurable threshold. Routes to EXECUTE (valid + confident), CLARIFY (ambiguous or low confidence), or RESPOND (out of scope). Retries INTERPRET once on validation failure.
 - **EXECUTE** — Deterministic SQL builder maps query plan fields to SQL expressions from the YAML model. No LLM-generated SQL.
 - **CLARIFY** — Returns a follow-up question. The graph exits; the next user message re-enters at INTERPRET with full history.
 - **RESPOND** — LLM formats query results into a natural language answer, or handles out-of-scope/error cases.
@@ -61,6 +61,8 @@ poetry install
 # Configure environment
 cp .env.example .env
 # Edit .env and add your OPENAI_API_KEY
+# Optional: set CONFIDENCE_THRESHOLD (default 0.7) to tune
+# how aggressively the agent asks for clarification
 ```
 
 ### Run

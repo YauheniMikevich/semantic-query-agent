@@ -2,6 +2,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from langchain_core.messages import HumanMessage
+from pydantic import ValidationError
 
 from semantic_query_agent.agent import create_agent
 from semantic_query_agent.models import InterpretResult, QueryPlan
@@ -160,3 +161,17 @@ async def test_empty_results_flow(semantic_model, db_conn):
 
         assert result["response"] is not None
         assert result["query_result"] == []
+
+
+def test_confidence_score_validation_bounds():
+    """Test that confidence_score enforces 0.0-1.0 bounds."""
+    with pytest.raises(ValidationError):
+        InterpretResult(confidence_score=1.5)
+    with pytest.raises(ValidationError):
+        InterpretResult(confidence_score=-0.1)
+
+    # Valid bounds should work
+    result = InterpretResult(confidence_score=0.0)
+    assert result.confidence_score == 0.0
+    result = InterpretResult(confidence_score=1.0)
+    assert result.confidence_score == 1.0

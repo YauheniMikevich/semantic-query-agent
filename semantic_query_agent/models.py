@@ -86,6 +86,16 @@ class InterpretResult(BaseModel):
     ambiguity_reason: str | None = Field(
         default=None, description="Explanation of why clarification is needed, None if query is clear"
     )
+    confidence_score: float = Field(
+        default=1.0,
+        ge=0.0,
+        le=1.0,
+        description="Confidence in the interpretation, 0.0 (no confidence) to 1.0 (fully confident)",
+    )
+    confidence_reasoning: str | None = Field(
+        default=None,
+        description="Explanation of uncertainty factors when confidence is below 1.0",
+    )
 
 
 # --- API schemas ---

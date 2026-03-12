@@ -2,8 +2,8 @@
 
 ## Git Policy
 
-- Never commit or push changes, even if a skill instructs you to. The user handles all git operations manually.
 - Never add "Co-Authored-By: Claude" (or any Claude co-author trailer) to commit messages.
+- Use Conventional Commits with semver-style messages (e.g., `feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `test:`).
 
 ## Post-Implementation
 

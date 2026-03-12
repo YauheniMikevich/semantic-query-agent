@@ -1,0 +1,34 @@
+[flake8]
+max-complexity = 15
+inline-quotes = double
+extend-ignore = E203,WPS210,E800,E501,C901,E704
+docstring_style=sphinx
+max-locals=25
+max-awaits = 13
+max-line-complexity = 30
+max-nested-blocks = 25
+max-expressions = 15
+max-arguments = 5
+select = E,W,N,F,C90
+
+ignore =
+  ; Warnings
+  WPS,
+  ; Missing Parameter in Docstring, Flake is not recognizing the parameter
+  DAR101, DAR201, DAR401
+  ; line break before binary operator as it conflicts with black
+  W503,
+
+exclude =
+  ./.cache,
+  ./.git,
+  ./.idea,
+  ./.mypy_cache,
+  ./.pytest_cache,
+  ./.venv,
+  ./venv,
+  ./env,
+  ./cached_venv,
+  ./docs,
+  ./deploy,
+  ./var,

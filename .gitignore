@@ -102,3 +102,6 @@ cython_debug/
 
 # Worktrees
 .worktrees/
+
+# PDF files
+*.pdf

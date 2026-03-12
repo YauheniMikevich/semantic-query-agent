@@ -9,11 +9,12 @@ def test_simple_metric_by_dimension(semantic_model):
         metrics=["total_revenue"],
         dimensions=["region"],
     )
-    sql = build_sql(plan, semantic_model)
+    sql, params = build_sql(plan, semantic_model)
     assert "SUM(sale_price_eur)" in sql
     assert "region" in sql
     assert "FROM TRANSACTIONS" in sql
     assert "GROUP BY" in sql
+    assert params == []
 
 
 def test_metric_with_filter(semantic_model):
@@ -22,10 +23,11 @@ def test_metric_with_filter(semantic_model):
         dimensions=["dealer_name"],
         filters={"vehicle_type": "Electric"},
     )
-    sql = build_sql(plan, semantic_model)
+    sql, params = build_sql(plan, semantic_model)
     assert "COUNT(transaction_id)" in sql
     assert "dealer_name" in sql
-    assert "vehicle_type = 'Electric'" in sql
+    assert "vehicle_type = ?" in sql
+    assert params == ["Electric"]
 
 
 def test_metric_with_time_period(semantic_model):
@@ -34,7 +36,7 @@ def test_metric_with_time_period(semantic_model):
         dimensions=["region"],
         time_period="last_quarter",
     )
-    sql = build_sql(plan, semantic_model)
+    sql, params = build_sql(plan, semantic_model)
     assert "AVG((sale_price_eur - cost_eur) / sale_price_eur * 100)" in sql
     assert "sale_date" in sql
     assert "GROUP BY" in sql
@@ -44,7 +46,7 @@ def test_metric_only_no_dimensions(semantic_model):
     plan = QueryPlan(
         metrics=["total_revenue"],
     )
-    sql = build_sql(plan, semantic_model)
+    sql, params = build_sql(plan, semantic_model)
     assert "SUM(sale_price_eur)" in sql
     assert "GROUP BY" not in sql
 
@@ -54,7 +56,7 @@ def test_multiple_metrics(semantic_model):
         metrics=["total_revenue", "units_sold"],
         dimensions=["region"],
     )
-    sql = build_sql(plan, semantic_model)
+    sql, params = build_sql(plan, semantic_model)
     assert "SUM(sale_price_eur)" in sql
     assert "COUNT(transaction_id)" in sql
     assert "GROUP BY" in sql
@@ -65,7 +67,7 @@ def test_sale_month_dimension_translates_to_strftime(semantic_model):
         metrics=["total_revenue"],
         dimensions=["sale_month"],
     )
-    sql = build_sql(plan, semantic_model)
+    sql, params = build_sql(plan, semantic_model)
     assert "STRFTIME" in sql
     assert "TO_CHAR" not in sql
 
@@ -75,7 +77,7 @@ def test_sale_quarter_dimension_translates_to_strftime(semantic_model):
         metrics=["total_revenue"],
         dimensions=["sale_quarter"],
     )
-    sql = build_sql(plan, semantic_model)
+    sql, params = build_sql(plan, semantic_model)
     assert "STRFTIME" in sql
     assert "TO_CHAR" not in sql
 
@@ -104,8 +106,8 @@ def test_sql_executes_revenue_by_region(semantic_model, db_conn):
         dimensions=["region"],
         time_period="ytd",
     )
-    sql = build_sql(plan, semantic_model)
-    result = db_conn.execute(sql).fetchall()
+    sql, params = build_sql(plan, semantic_model)
+    result = db_conn.execute(sql, params).fetchall()
     assert len(result) > 0
     # Each row should have (region, total_revenue)
     for row in result:
@@ -120,8 +122,8 @@ def test_sql_executes_electric_vehicles_by_dealer(semantic_model, db_conn):
         filters={"vehicle_type": "Electric"},
         time_period="last_quarter",
     )
-    sql = build_sql(plan, semantic_model)
-    result = db_conn.execute(sql).fetchall()
+    sql, params = build_sql(plan, semantic_model)
+    result = db_conn.execute(sql, params).fetchall()
     assert len(result) > 0
 
 
@@ -131,8 +133,8 @@ def test_sql_executes_revenue_by_sale_month(semantic_model, db_conn):
         metrics=["total_revenue"],
         dimensions=["sale_month"],
     )
-    sql = build_sql(plan, semantic_model)
-    result = db_conn.execute(sql).fetchall()
+    sql, params = build_sql(plan, semantic_model)
+    result = db_conn.execute(sql, params).fetchall()
     assert len(result) > 0
     # sale_month should be YYYY-MM format
     assert "-" in str(result[0][0])

@@ -164,12 +164,12 @@ def execute_node(state: AgentState) -> dict:
     """Execute the SQL query against DuckDB."""
     plan = state.interpret_result.query_plan
     try:
-        sql = build_sql(plan, _semantic_model)
-        rows = _db_conn.execute(sql).fetchall()
+        sql, params = build_sql(plan, _semantic_model)
+        rows = _db_conn.execute(sql, params).fetchall()
         columns = [desc[0] for desc in _db_conn.description]
         query_result = [dict(zip(columns, row)) for row in rows]
         return {"query_result": query_result}
-    except duckdb.Error as e:
+    except (duckdb.Error, ValueError) as e:
         return {"error": str(e)}
 
 

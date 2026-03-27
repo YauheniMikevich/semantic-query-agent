@@ -72,7 +72,15 @@ class QueryPlan(BaseModel):
 
     metrics: list[str] = Field(description="List of metric names to compute (from semantic model)")
     dimensions: list[str] = Field(default_factory=list, description="List of dimension names to group by")
-    filters: dict[str, str] = Field(default_factory=dict, description="Dimension name -> value to filter on")
+    filters: dict[str, str] = Field(
+        default_factory=dict,
+        description=(
+            "Dimension name -> value to filter on. "
+            "When the user mentions a specific category (e.g. 'electric vehicles'), "
+            "map it to the corresponding dimension and value from the synonym list "
+            "(e.g. {'vehicle_type': 'Electric'})."
+        ),
+    )
     time_period: str | None = Field(default=None, description="Time period name (e.g. 'last_quarter', 'ytd')")
 
 

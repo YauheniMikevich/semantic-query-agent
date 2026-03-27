@@ -1,4 +1,4 @@
-.PHONY: black isort flake8 lint black-check isort-check lint-check run test
+.PHONY: black isort flake8 lint black-check isort-check lint-check run test demo regression
 
 black:
 	poetry run black . || true
@@ -27,3 +27,6 @@ test:
 
 demo:
 	poetry run python run_test_questions.py
+
+regression:
+	poetry run pytest tests/test_regression.py -v -m regression

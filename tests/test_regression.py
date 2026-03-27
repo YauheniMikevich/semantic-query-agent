@@ -16,7 +16,7 @@ SEMANTIC_MODEL_PATH = ROOT / "semantic_model.yaml"
 pytestmark = [
     pytest.mark.regression,
     pytest.mark.skipif(
-        os.environ.get("OPENAI_API_KEY", "test-key") == "test-key",
+        not os.environ.get("OPENAI_API_KEY"),
         reason="OPENAI_API_KEY not set; skipping regression tests",
     ),
 ]
@@ -69,18 +69,18 @@ async def test_clear_query(agent, test_case):
     expected = test_case["expected_interpretation"]
     plan = interpret.query_plan
 
-    assert set(plan.metrics) == set(expected["metrics"]), (
-        f"Q{test_case['id']}: metrics mismatch: {plan.metrics} != {expected['metrics']}"
-    )
-    assert set(plan.dimensions) == set(expected["dimensions"]), (
-        f"Q{test_case['id']}: dimensions mismatch: {plan.dimensions} != {expected['dimensions']}"
-    )
-    assert plan.filters == expected["filters"], (
-        f"Q{test_case['id']}: filters mismatch: {plan.filters} != {expected['filters']}"
-    )
-    assert plan.time_period == expected["time_period"], (
-        f"Q{test_case['id']}: time_period mismatch: {plan.time_period} != {expected['time_period']}"
-    )
+    assert set(plan.metrics) == set(
+        expected["metrics"]
+    ), f"Q{test_case['id']}: metrics mismatch: {plan.metrics} != {expected['metrics']}"
+    assert set(plan.dimensions) == set(
+        expected["dimensions"]
+    ), f"Q{test_case['id']}: dimensions mismatch: {plan.dimensions} != {expected['dimensions']}"
+    assert (
+        plan.filters == expected["filters"]
+    ), f"Q{test_case['id']}: filters mismatch: {plan.filters} != {expected['filters']}"
+    assert (
+        plan.time_period == expected["time_period"]
+    ), f"Q{test_case['id']}: time_period mismatch: {plan.time_period} != {expected['time_period']}"
 
     # --- Query results assertions ---
     actual_results = result.get("query_result")
@@ -92,9 +92,7 @@ async def test_clear_query(agent, test_case):
     expected_sorted = _sort_results(_round_floats(expected_results))
 
     assert actual_sorted == expected_sorted, (
-        f"Q{test_case['id']}: results mismatch:\n"
-        f"  actual:   {actual_sorted}\n"
-        f"  expected: {expected_sorted}"
+        f"Q{test_case['id']}: results mismatch:\n" f"  actual:   {actual_sorted}\n" f"  expected: {expected_sorted}"
     )
 
 

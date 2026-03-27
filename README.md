@@ -138,3 +138,4 @@ run_test_questions.py    # Demo script: runs test questions end-to-end
 - **Single-process** — in-memory session store doesn't scale horizontally
 - **Time periods are computed relative to the dataset's max date**, not the current wall clock
 - **DuckDB dialect only** — the YAML model uses Snowflake syntax (`TO_CHAR`), which the SQL builder translates to DuckDB equivalents (`STRFTIME`) at runtime
+- **No observability or monitoring** — no structured logging, request tracing, or metrics collection; LLM calls are opaque with no latency/token tracking

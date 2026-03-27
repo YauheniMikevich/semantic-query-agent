@@ -18,6 +18,21 @@ def build_interpret_system_prompt(model: SemanticModel) -> str:
         f'  - "{s.term}" -> {s.maps_to}' + (f" (value: {s.value})" if s.value else "") for s in model.synonyms
     )
 
+    examples_section = ""
+    if model.sample_questions:
+        examples = []
+        for sq in model.sample_questions:
+            parts = [f'  Q: "{sq.question}"']
+            parts.append(f"    metrics: {sq.metrics}")
+            if sq.dimensions:
+                parts.append(f"    dimensions: {sq.dimensions}")
+            if sq.filters:
+                parts.append(f"    filters: {sq.filters}")
+            if sq.time_period:
+                parts.append(f"    time_period: {sq.time_period}")
+            examples.append("\n".join(parts))
+        examples_section = "\n\nEXAMPLES (showing correct query plan extraction):\n" + "\n\n".join(examples)
+
     return f"""You are a vehicle sales analytics assistant. Your job is to interpret natural language questions and extract a structured query plan.
 
 TODAY'S DATE: 2025-11-18
@@ -36,6 +51,7 @@ TIME PERIODS (predefined time ranges):
 
 SYNONYMS (alternative terms users might use):
 {synonyms_section}
+{examples_section}
 
 INSTRUCTIONS:
 1. If the user asks a clear analytics question, extract the metrics, dimensions, filters, and time period.

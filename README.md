@@ -25,10 +25,10 @@ graph LR
 stateDiagram-v2
     [*] --> INTERPRET
     INTERPRET --> ROUTE
-    ROUTE --> EXECUTE : valid plan,\nhigh confidence
-    ROUTE --> CLARIFY : ambiguous or\nlow confidence
+    ROUTE --> EXECUTE : valid plan, high confidence
+    ROUTE --> CLARIFY : ambiguous or low confidence
     ROUTE --> RESPOND : out of scope
-    ROUTE --> INTERPRET : invalid plan\n(retry, max 1)
+    ROUTE --> INTERPRET : invalid plan (retry, max 1)
     EXECUTE --> RESPOND
     CLARIFY --> [*] : return clarification question
     RESPOND --> [*] : return answer

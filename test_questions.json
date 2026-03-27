@@ -8,6 +8,13 @@
       "filters": {},
       "time_period": "last_quarter"
     },
+    "expected_results": [
+      {"region": "Nordic", "avg_deal_margin": 26.17},
+      {"region": "DACH", "avg_deal_margin": 24.74},
+      {"region": "Benelux", "avg_deal_margin": 18.57},
+      {"region": "UK", "avg_deal_margin": 14.16},
+      {"region": "Southern Europe", "avg_deal_margin": 8.42}
+    ],
     "notes": "Primary test case. Should return 5 regions with margin percentages. Nordic should have highest margin, Southern Europe lowest."
   },
   {
@@ -19,6 +26,18 @@
       "filters": {},
       "time_period": "ytd"
     },
+    "expected_results": [
+      {"vehicle_model": "EX90", "total_revenue": 3952521.0},
+      {"vehicle_model": "XC60", "total_revenue": 3567627.0},
+      {"vehicle_model": "S90", "total_revenue": 3284513.0},
+      {"vehicle_model": "XC90", "total_revenue": 3260196.0},
+      {"vehicle_model": "V90", "total_revenue": 3127212.0},
+      {"vehicle_model": "C40", "total_revenue": 2524326.0},
+      {"vehicle_model": "V60", "total_revenue": 2452511.0},
+      {"vehicle_model": "S60", "total_revenue": 2259961.0},
+      {"vehicle_model": "EX30", "total_revenue": 2147245.0},
+      {"vehicle_model": "XC40", "total_revenue": 1745156.0}
+    ],
     "notes": "Tests YTD time period and revenue metric."
   },
   {
@@ -32,6 +51,27 @@
       },
       "time_period": "last_quarter"
     },
+    "expected_results": [
+      {"dealer_name": "London Motors", "units_sold": 8},
+      {"dealer_name": "Rome Cars", "units_sold": 6},
+      {"dealer_name": "Amsterdam Cars", "units_sold": 5},
+      {"dealer_name": "Berlin Volvo", "units_sold": 4},
+      {"dealer_name": "Manchester Auto", "units_sold": 4},
+      {"dealer_name": "Rotterdam Volvo", "units_sold": 4},
+      {"dealer_name": "Vienna Motors", "units_sold": 4},
+      {"dealer_name": "Birmingham Cars", "units_sold": 3},
+      {"dealer_name": "Edinburgh Volvo", "units_sold": 3},
+      {"dealer_name": "Oslo Auto", "units_sold": 3},
+      {"dealer_name": "Madrid Motors", "units_sold": 3},
+      {"dealer_name": "Munich Premium", "units_sold": 2},
+      {"dealer_name": "Helsinki Cars", "units_sold": 2},
+      {"dealer_name": "Brussels Auto", "units_sold": 2},
+      {"dealer_name": "Milan Auto", "units_sold": 2},
+      {"dealer_name": "Barcelona Volvo", "units_sold": 2},
+      {"dealer_name": "Copenhagen Volvo", "units_sold": 2},
+      {"dealer_name": "Zurich Auto", "units_sold": 2},
+      {"dealer_name": "Stockholm Motors", "units_sold": 1}
+    ],
     "notes": "Tests filtering by vehicle_type and ranking. Should identify top dealer."
   },
   {
